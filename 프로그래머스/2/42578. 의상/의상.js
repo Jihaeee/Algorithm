@@ -6,7 +6,7 @@ function solution(clothes) {
     }
 
     let answer = 1;
-    for(v of [...map.values()]){
+    for(const v of map.values()){
         answer = answer * (v+1)
     }
     return answer -1 
