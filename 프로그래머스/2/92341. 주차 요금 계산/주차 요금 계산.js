@@ -1,35 +1,39 @@
 function solution(fees, records) {
-    const [baseTime, baseFee, unitTime, unitFee] = fees
+    const [bt, bc, ut, uc] = fees;
     
-    const statusMap = {};
-    const totalTime = {};
-    records.forEach(line => {
-        const [time, number, status ] = line.split(" ")
-        const [h, m] = time.split(":").map(Number)
-        
-        const totalMinutes = h*60 + m
-        
-        if(status === "IN") {
-            statusMap[number] = totalMinutes
-        } else {
-            const duration = totalMinutes - statusMap[number];
-            totalTime[number] = (totalTime[number] || 0) + duration;
-            delete statusMap[number]
+    const toMin = (t) => {
+        const [h,m] = t.split(":").map(Number);
+        return h*60 + m;
+    }
+    
+    const inTime = new Map();
+    const total = new Map();
+    
+    for(const record of records){
+        const [time, num, io] = record.split(" ");
+        if(io === "IN"){
+            inTime.set(num, toMin(time));
         }
-    })
-    
-        for (const num in statusMap){
-            const duration = 1439 - statusMap[num]
-            totalTime[num] = (totalTime[num] || 0) + duration;
+        if(io ==="OUT"){
+            const stay = toMin(time) - inTime.get(num);
+            total.set(num, ((total.get(num) || 0)+ stay)); // 누적으로 계산
+            inTime.delete(num); 
         }
         
-        const result = Object.keys(totalTime)
-        .sort()
-        .map(num => {
-            const time = totalTime[num];
-            if (time <= baseTime) return baseFee; 
-            
-            return baseFee + Math.ceil((time - baseTime) / unitTime) * unitFee;
-        });
-    return result;
+    }
+    
+    // inTime에 남은 애들은 23:59 출차 
+    for(const [num, t] of inTime){
+        const stay = toMin("23:59") - t;
+        total.set(num, (total.get(num) || 0) + stay);
+    }
+    
+    const cars = [...total.keys()].sort();
+    let answer = [];
+    for(const c of cars){
+        const time = total.get(c);
+        if(time <=bt) answer.push(bc);
+        else answer.push(bc + Math.ceil((time-bt) / ut) * uc)
+    }
+    return answer;
 }
