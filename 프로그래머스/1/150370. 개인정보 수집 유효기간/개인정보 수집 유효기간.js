@@ -1,28 +1,25 @@
 function solution(today, terms, privacies) {
-    const result = [];
-    const [tY, tM, tD] = today.split(".").map(Number);
-    const totalDay = tY*12*28 + tM*28 + tD
+    const today_arr = today.split(".").map(Number); // [2022, 5, 19]
+    const day = (today_arr[0] * 28 * 12) + (today_arr[1] * 28) + today_arr[2]
     
-    const termMap = {};
-    terms.forEach(line => {
-        const [type, month] = line.split(" ");
-        termMap[type] = Number(month) * 28; 
-    });
+    const term_map = new Map();
+    for(const t of terms){
+        const [type, month] = t.split(" ");
+        term_map.set(type, Number(month) * 28)
+    }
+    let answer = [];
+    let count=1;
     
-    privacies.forEach((line, index) => {
-        const [fullDate, type] = line.split(" ");
-        const [y, m, d] = fullDate.split(".").map(Number);
+    for (const p of privacies){
+        const [date, type] = p.split(" "); 
+        const [y, m, d] = date.split(".").map(Number);
+        const collected = y * 28 *12 + m * 28 + d
         
-        const expiryTotal = (y * 12 * 28) + (m * 28) + d + termMap[type];
-        
-        if (totalDay >= expiryTotal) {
-            result.push(index + 1);
-    };
-    });
+        if(term_map.get(type) + collected <= day){
+            answer.push(count);
+        }
+        count++;
+    }
+    return answer;
     
-    
-    
-    
-
-    return result
 }
