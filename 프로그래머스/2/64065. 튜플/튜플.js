@@ -1,21 +1,16 @@
 function solution(s) {
-    var answer = [];
-    // s의 개수 = 튜플을 구성하는 숫자의 수
-    // s 1개짜리 -> 1번, 2개짜리 2번
-    const groups = s.slice(2, -2).split("},{")
-
-    groups.sort((a, b) => a.split(",").length - b.split(",").length);
+    s=s.slice(2,-2).split('},{').map(x => x.split(",").map(Number))
+    s.sort((a,b) => a.length - b.length);
     
-    groups.forEach(group => {
-        const numbers = group.split(",").map(Number);
-        numbers.forEach(num => {
-            if (!answer.includes(num)) {
-                answer.push(num);
-            }
-        });
-        
-    })
-    
-    return answer
-   
+    let result = [];
+    const seen = new Set();
+    for(const tuple of s){
+        for(const num of tuple){
+            if(!seen.has(num)){
+                result.push(num);
+                seen.add(num); // {3}
+            }   
+        }
+    }
+    return result
 }
