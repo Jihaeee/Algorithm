@@ -1,48 +1,36 @@
 function solution(park, routes) {
-    // [행, 열]
-    const direction = {
-        N: [-1, 0],  
-        S: [1, 0],   
-        W: [0, -1],  
-        E: [0, 1],   
+    const dir = {
+        'E': [0,1],
+        'W': [0, -1],
+        'S': [1,0],
+        'N': [-1,0]
     };
-
-    const H = park.length;    
-    const W = park[0].length;  
-
-    // 시작 위치 저장
-    let r = 0, c = 0;
-    for (let i = 0; i < H; i++) {
-        for (let j = 0; j < W; j++) {
-            if (park[i][j] === "S") {
-                r = i;
-                c = j;
-            }
+    let r = park.length
+    let c = park[0].length
+    // 시작 지점 찾기 (row,i)
+    let start = [];
+    for(let i=0; i<r;i++){
+        for(let j=0;j<c;j++){
+            // 시작 지점 찾기 
+            if(park[i][j] === 'S') start = [i,j];
         }
     }
-
-    for (const route of routes) {
-        const [op, n] = route.split(" ");
-        const [dr, dc] = direction[op];
-
-        // 임시 위치
-        let nr = r, nc = c;
-        let ok = true;
-        for (let step = 0; step < Number(n); step++) {
-            nr += dr;
-            nc += dc;
-            if (nr < 0 || nr >= H || nc < 0 || nc >= W || park[nr][nc] === "X") {
-                ok = false;
-                break;
+            let [x,y] = start;
+            // 경로 확인 시작
+            for(const route of routes){
+                const [d, num] = route.split(" ")
+                let n = Number(num)
+                let [dx, dy] = dir[d]
+                let ok = true;
+                
+                for(let step=1; step<=n;step++){
+                    let nx = x + dx * step
+                    let ny = y + dy * step
+                
+                    if(nx>=r || nx<0 || ny>=c || ny<0 || park[nx][ny] === 'X') ok = false;
+                }
+                if(ok) { x+= dx * n; y+= dy*n}
+        
             }
-        }
-
-        // 성공했을 때 진짜 위치에 반영 
-        if (ok) {
-            r = nr;
-            c = nc;
-        }
-    }
-
-    return [r, c];
+    return [x,y]
 }
